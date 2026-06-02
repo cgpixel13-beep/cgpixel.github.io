@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================
+  ✏️  EDIT: Change the tab title below
+============================================================ -->
+<title>CG Pixel — Lokesh · Photographer · Kent</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   ✏️  EASY EDIT ZONE — Change site-wide values here
+============================================================ */
+:root {
+  --black:      #000000;   /* Main background */
+  --white:      #ffffff;   /* Main text */
+  --gray:       #666666;   /* Muted text */
+  --light:      #aaaaaa;   /* Very muted */
+  --border:     #1f1f1f;   /* Subtle borders */
+  --hover-bg:   #0f0f0f;   /* Hover states */
+
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --font-body:    'Barlow', sans-serif;
+}
+/* ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--white); }
+
+/* ── CURSOR ── */
+#cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--white);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, background .2s, border-radius .3s;
+  mix-blend-mode: difference;
+}
+#cursor.big {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: var(--white);
+}
+#cursor.text-mode {
+  width: 3px; height: 28px;
+  border-radius: 2px;
+}
+
+/* ── LOADER ── */
+#loader {
+  position: fixed; inset: 0;
+  background: var(--black);
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem 3rem;
+  transition: opacity .7s ease, visibility .7s ease;
+}
+#loader.out { opacity: 0; visibility: hidden; }
+.loader-top {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  letter-spacing: .2em;
+  color: var(--gray);
+  text-transform: uppercase;
+}
+.loader-center {
+  text-align: center;
+}
+.loader-pct {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 18vw, 14rem);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.loader-label {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .3em;
+  color: var(--gray);
+  text-transform: uppercase;
+  margin-top: .5rem;
+}
+.loader-bar {
+  width: 0%;
+  height: 1px;
+  background: var(--white);
+  transition: width .05s linear;
+}
+.loader-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.loader-bottom span {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .2em;
+  color: var(--gray);
+  text-transform: uppercase;
+}
+
+/* ── NAVIGATION ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9000;
+  padding: 2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: padding .4s ease;
+}
+nav.scrolled { padding: 1.2rem 3rem; }
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--white);
+  text-decoration: none;
+  position: relative; z-index: 9002;
+}
+.nav-links {
+  display: flex; gap: 2.5rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  letter-spacing: .15em;
+  text-transform: lowercase;
+  color: var(--gray);
+  text-decoration: none;
+  transition: color .3s;
+}
+.nav-links a:hover { color: var(--white); }
+
+.nav-burger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: none;
+  position: relative; z-index: 9002;
+  padding: 4px;
+}
+.burger-line {
+  width: 24px; height: 1px;
+  background: var(--white);
+  transition: transform .4s ease, opacity .4s ease, width .4s ease;
+  transform-origin: center;
+}
+.nav-burger.open .burger-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-burger.open .burger-line:nth-child(2) { opacity: 0; width: 0; }
+.nav-burger.open .burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ── FULLSCREEN MENU ── */
+#menu-overlay {
+  position: fixed; inset: 0;
+  background: var(--white);
+  z-index: 9001;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8rem 3rem 3rem;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path .7s cubic-bezier(.77,0,.18,1);
+}
+#menu-overlay.open { clip-path: inset(0 0 0% 0); }
+
+.menu-nav-links { list-style: none; }
+.menu-nav-links li {
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.menu-nav-links a {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 700;
+  color: var(--black);
+  text-decoration: none;
+  padding: .8rem 0;
+  letter-spacing: -.02em;
+  transform: translateY(110%);
+  transition: transform .6s cubic-bezier(.77,0,.18,1), color .3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.menu-nav-links a:hover { color: var(--gray); }
+#menu-overlay.open .menu-nav-links a { transform: translateY(0); }
+#menu-overlay.open .menu-nav-links li:nth-child(1) a { transition-delay: .1s; }
+#menu-overlay.open .menu-nav-links li:nth-child(2) a { transition-delay: .15s; }
+#menu-overlay.open .menu-nav-links li:nth-child(3) a { transition-delay: .2s; }
+#menu-overlay.open .menu-nav-links li:nth-child(4) a { transition-delay: .25s; }
+
+.menu-link-arrow { font-size: 1.5rem; }
+.menu-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.menu-contact {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.menu-contact a {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .1em;
+  color: rgba(0,0,0,.5);
+  text-decoration: none;
+  transition: color .3s;
+}
+.menu-contact a:hover { color: var(--black); }
+.menu-social {
+  display: flex;
+  gap: 1.5rem;
+}
+.menu-social a {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.4);
+  text-decoration: none;
+  transition: color .3s;
+}
+.menu-social a:hover { color: var(--black); }
+
+/* ── HERO ── */
+#hero {
+  height: 100vh;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 3rem 4rem;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.hero-tag {
+  position: absolute;
+  top: 50%;
+  right: 3rem;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--gray);
+  writing-mode: vertical-rl;
+  opacity: 0;
+  animation: fadeIn .8s 2.4s ease forwards;
+}
+.hero-available {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  opacity: 0;
+  animation: fadeIn .6s 2s ease forwards;
+}
+.hero-dot {
+  width: 6px; height: 6px;
+  background: var(--white);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .4; transform: scale(.7); }
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 11rem);
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.04em;
+  color: var(--white);
+  overflow: hidden;
+  opacity: 0;
+  animation: slideUp 1s 2.1s cubic-bezier(.16,1,.3,1) forwards;
+}
+.hero-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gray);
+}
+.hero-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 3rem;
+  opacity: 0;
+  animation: fadeIn .8s 2.5s ease forwards;
+}
+.hero-desc {
+  font-family: var(--font-body);
+  font-size: .85rem;
+  line-height: 1.8;
+  color: var(--gray);
+  max-width: 320px;
+  font-weight: 300;
+}
+.hero-scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .8rem;
+}
+.hero-scroll span {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.scroll-arrow {
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, var(--white));
+  animation: scrollPulse 1.8s ease infinite;
+}
+@keyframes scrollPulse {
+  0%,100% { transform: scaleY(1); opacity: 1; }
+  50%      { transform: scaleY(.5); opacity: .4; }
+}
+
+/* ── TICKER ── */
+.ticker {
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  padding: 1.2rem 0;
+  white-space: nowrap;
+}
+.ticker-track {
+  display: inline-flex;
+  animation: ticker 20s linear infinite;
+}
+.ticker-item {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gray);
+  padding: 0 3rem;
+}
+.ticker-item::before {
+  content: '—';
+  margin-right: 3rem;
+}
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── WORK / PORTFOLIO ── */
+#work {
+  padding: 6rem 3rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.section-count {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  color: var(--gray);
+  letter-spacing: .1em;
+}
+
+/* portfolio grid */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto;
+  gap: 1px;
+  background: var(--border);
+}
+.p-item {
+  position: relative;
+  overflow: hidden;
+  background: var(--black);
+  cursor: none;
+}
+.p-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(100%) brightness(.85);
+  transition: filter .6s ease, transform .8s cubic-bezier(.25,.46,.45,.94);
+}
+.p-item:hover img {
+  filter: grayscale(0%) brightness(1);
+  transform: scale(1.04);
+}
+.p-item .p-info {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,.9) 0%, transparent 100%);
+  transform: translateY(100%);
+  transition: transform .5s cubic-bezier(.77,0,.18,1);
+}
+.p-item:hover .p-info { transform: translateY(0); }
+.p-info-num {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  color: rgba(255,255,255,.4);
+  display: block;
+  margin-bottom: .3rem;
+}
+.p-info-title {
+  font-family: var(--font-display);
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--white);
+}
+.p-info-cat {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.5);
+  margin-top: .2rem;
+}
+
+/* grid layout */
+.p1 { grid-column: 1/6;  aspect-ratio: 4/5; }
+.p2 { grid-column: 6/9;  aspect-ratio: 3/4; }
+.p3 { grid-column: 9/13; aspect-ratio: 1/1; }
+.p4 { grid-column: 1/4;  aspect-ratio: 1/1; }
+.p5 { grid-column: 4/9;  aspect-ratio: 16/9; }
+.p6 { grid-column: 9/13; aspect-ratio: 4/5; }
+
+/* ── ABOUT ── */
+#about {
+  padding: 8rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.about-left {
+  padding-right: 6rem;
+  border-right: 1px solid var(--border);
+}
+.about-right { padding-left: 6rem; }
+
+.about-big-text {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  color: var(--white);
+  margin-bottom: 3rem;
+}
+.about-big-text em { font-style: italic; font-weight: 400; color: var(--gray); }
+.about-body {
+  font-size: .85rem;
+  line-height: 1.9;
+  color: var(--gray);
+  font-weight: 300;
+  margin-bottom: 2.5rem;
+}
+
+/* ── PROFILE PHOTO ── */
+.about-photo-wrap {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+.about-photo {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(100%);
+  transition: filter .5s ease;
+}
+.about-photo:hover { filter: grayscale(0%); }
+.about-photo-label {
+  position: absolute;
+  bottom: 1rem; right: 1rem;
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  background: rgba(0,0,0,.6);
+  padding: .4rem .8rem;
+}
+
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+.stat {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.stat:nth-child(even) { border-right: none; padding-left: 1.5rem; }
+.stat:nth-child(odd)  { padding-right: 1.5rem; }
+.stat-n {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1;
+  display: block;
+}
+.stat-l {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gray);
+  display: block;
+  margin-top: .4rem;
+}
+
+/* ── SERVICES ── */
+#services {
+  padding: 6rem 3rem;
+  border-bottom: 1px solid var(--border);
+}
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0;
+}
+.services-left {
+  padding-right: 4rem;
+  border-right: 1px solid var(--border);
+  padding-top: 2rem;
+}
+.services-left .section-label { margin-bottom: 2rem; display: block; }
+.services-left p {
+  font-size: .8rem;
+  line-height: 1.8;
+  color: var(--gray);
+  font-weight: 300;
+}
+.services-right { padding-left: 4rem; }
+.service-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.8rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 2rem;
+  transition: background .3s;
+  cursor: none;
+}
+.service-row:hover { padding-left: .5rem; }
+.service-row:first-child { padding-top: 0; }
+.service-left-col { display: flex; align-items: flex-start; gap: 1.5rem; flex: 1; }
+.srv-num {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .15em;
+  color: var(--gray);
+  margin-top: .1rem;
+  flex-shrink: 0;
+}
+.srv-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: -.01em;
+}
+.srv-desc {
+  font-size: .78rem;
+  line-height: 1.7;
+  color: var(--gray);
+  margin-top: .3rem;
+  font-weight: 300;
+}
+.srv-price {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  color: var(--white);
+  white-space: nowrap;
+  padding-top: .1rem;
+}
+
+/* ── CONTACT ── */
+#contact {
+  padding: 8rem 3rem;
+  border-bottom: 1px solid var(--border);
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.contact-left {
+  padding-right: 6rem;
+  border-right: 1px solid var(--border);
+}
+.contact-right { padding-left: 6rem; }
+
+.contact-big {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: .95;
+  letter-spacing: -.04em;
+  color: var(--white);
+  margin-bottom: 3rem;
+  margin-top: 1rem;
+}
+.contact-big em { font-style: italic; font-weight: 400; color: var(--gray); }
+
+.contact-emails { margin-top: 2rem; }
+.contact-email-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: none;
+  transition: background .3s;
+  gap: 1rem;
+}
+.contact-email-row:hover { padding-left: .5rem; }
+.email-label {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gray);
+  width: 80px;
+  flex-shrink: 0;
+}
+.email-val {
+  font-family: var(--font-display);
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--white);
+  text-decoration: none;
+  flex: 1;
+  transition: color .3s;
+}
+.email-val:hover { color: var(--gray); }
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--gray);
+  background: none;
+  border: 1px solid var(--border);
+  padding: .35rem .8rem;
+  cursor: none;
+  transition: background .3s, color .3s, border-color .3s;
+  flex-shrink: 0;
+}
+.copy-btn:hover, .copy-btn.copied {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+/* contact form */
+.contact-form { display: flex; flex-direction: column; gap: 0; }
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.form-label {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.form-input, .form-textarea {
+  background: transparent;
+  border: none;
+  padding: .4rem 0;
+  font-family: var(--font-display);
+  font-size: .95rem;
+  font-weight: 400;
+  color: var(--white);
+  outline: none;
+  width: 100%;
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--border); }
+.form-textarea { resize: none; min-height: 80px; }
+.form-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  color: var(--black);
+  border: none;
+  padding: 1.2rem 1.5rem;
+  font-family: var(--font-display);
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: none;
+  margin-top: 1.5rem;
+  transition: background .3s, color .3s;
+  width: 100%;
+}
+.form-submit:hover { background: var(--gray); color: var(--white); }
+.submit-arrow { font-size: 1.2rem; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 2.5rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--white);
+  text-decoration: none;
+}
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .15em;
+  color: var(--gray);
+}
+.footer-links { display: flex; gap: 2rem; }
+.footer-links a {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--gray);
+  text-decoration: none;
+  transition: color .3s;
+}
+.footer-links a:hover { color: var(--white); }
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .9s ease, transform .9s ease;
+}
+.reveal.on { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: .1s; }
+.reveal-d2 { transition-delay: .2s; }
+.reveal-d3 { transition-delay: .3s; }
+.reveal-d4 { transition-delay: .4s; }
+
+@keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+@keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+  nav { padding: 1.5rem; }
+  nav.scrolled { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  #hero { padding: 0 1.5rem 3rem; }
+  .hero-tag { display: none; }
+  .hero-title { font-size: clamp(3rem, 16vw, 6rem); }
+  #work { padding: 4rem 1.5rem; }
+  .portfolio-grid { grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); }
+  .p1,.p2,.p3,.p4,.p5,.p6 { grid-column: auto; grid-row: auto; aspect-ratio: 1/1; }
+  #about { grid-template-columns: 1fr; padding: 4rem 1.5rem; gap: 3rem; }
+  .about-left { padding-right: 0; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 3rem; }
+  .about-right { padding-left: 0; }
+  #services { padding: 4rem 1.5rem; }
+  .services-grid { grid-template-columns: 1fr; }
+  .services-left { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 2rem; margin-bottom: 2rem; }
+  .services-right { padding-left: 0; }
+  #contact { padding: 4rem 1.5rem; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-left { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 3rem; margin-bottom: 3rem; }
+  .contact-right { padding-left: 0; }
+  footer { flex-direction: column; align-items: flex-start; padding: 2rem 1.5rem; }
+  #menu-overlay { padding: 6rem 1.5rem 2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+   CURSOR
+============================================================ -->
+<div id="cursor"></div>
+
+<!-- ============================================================
+   LOADER
+============================================================ -->
+<div id="loader">
+  <div class="loader-top">CG Pixel — Loading</div>
+  <div class="loader-center">
+    <div class="loader-pct" id="loaderNum">0</div>
+    <div class="loader-label">Initialising</div>
+  </div>
+  <div>
+    <div class="loader-bar" id="loaderBar"></div>
+    <div class="loader-bottom" style="margin-top:1rem;">
+      <span>Photography & Editing</span>
+      <!-- ✏️ EDIT: Change your location -->
+      <span>Kent, United Kingdom</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   FULLSCREEN MENU
+============================================================ -->
+<div id="menu-overlay">
+  <ul class="menu-nav-links">
+    <li><a href="#work">Work <span class="menu-link-arrow">↗</span></a></li>
+    <li><a href="#about">About <span class="menu-link-arrow">↗</span></a></li>
+    <li><a href="#services">Services <span class="menu-link-arrow">↗</span></a></li>
+    <li><a href="#contact">Contact <span class="menu-link-arrow">↗</span></a></li>
+  </ul>
+  <div class="menu-footer">
+    <div class="menu-contact">
+      <!-- ✏️ EDIT: Replace with your email -->
+      <a href="mailto:hello@cgpixel.co.uk">hello@cgpixel.co.uk</a>
+      <!-- ✏️ EDIT: Replace with your phone number -->
+      <a href="tel:+447000000000">+44 700 000 0000</a>
+      <!-- ✏️ EDIT: Your location -->
+      <a>Kent, United Kingdom</a>
+    </div>
+    <div class="menu-social">
+      <!-- ✏️ EDIT: Replace with your Instagram URL -->
+      <a href="https://www.instagram.com/lokesh_c.g/" target="_blank">Instagram</a>
+      <!-- ✏️ EDIT: Replace with your portfolio URL -->
+      <a href="https://cgpixel.myportfolio.com/" target="_blank">Portfolio</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   NAVIGATION
+============================================================ -->
+<nav id="nav">
+  <!-- ✏️ EDIT: Change your brand name -->
+  <a href="#" class="nav-logo">CG Pixel</a>
+  <ul class="nav-links">
+    <li><a href="#work">work</a></li>
+    <li><a href="#about">about</a></li>
+    <li><a href="#services">services</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+  <div class="nav-burger" id="burger">
+    <div class="burger-line"></div>
+    <div class="burger-line"></div>
+    <div class="burger-line"></div>
+  </div>
+</nav>
+
+<!-- ============================================================
+   HERO
+============================================================ -->
+<section id="hero">
+  <div class="hero-available">
+    <span class="hero-dot"></span>
+    Available for bookings — Kent &amp; UK-wide
+  </div>
+  <h1 class="hero-title">
+    Visual<br><em>Stories</em>
+  </h1>
+  <div class="hero-bottom">
+    <!-- ✏️ EDIT: Change your tagline -->
+    <p class="hero-desc">
+      Photography and editing that transforms
+      moments into images that endure.
+      Based in Kent, working worldwide.
+    </p>
+    <div class="hero-scroll">
+      <div class="scroll-arrow"></div>
+      <span>Scroll</span>
+    </div>
+  </div>
+  <!-- ✏️ EDIT: Change your years of experience -->
+  <span class="hero-tag">4+ Years · Est. 2020</span>
+</section>
+
+<!-- ============================================================
+   TICKER
+============================================================ -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">Photography</span>
+    <span class="ticker-item">Photo Editing</span>
+    <span class="ticker-item">Video Production</span>
+    <span class="ticker-item">Portraits</span>
+    <span class="ticker-item">Weddings</span>
+    <span class="ticker-item">Real Estate</span>
+    <span class="ticker-item">Kent, UK</span>
+    <span class="ticker-item">Lightroom</span>
+    <span class="ticker-item">Photoshop</span>
+    <span class="ticker-item">Photography</span>
+    <span class="ticker-item">Photo Editing</span>
+    <span class="ticker-item">Video Production</span>
+    <span class="ticker-item">Portraits</span>
+    <span class="ticker-item">Weddings</span>
+    <span class="ticker-item">Real Estate</span>
+    <span class="ticker-item">Kent, UK</span>
+    <span class="ticker-item">Lightroom</span>
+    <span class="ticker-item">Photoshop</span>
+  </div>
+</div>
+
+<!-- ============================================================
+   PORTFOLIO / WORK
+   ✏️ EDIT: Replace each src="..." with YOUR photo URLs
+   You can use a local file path or a hosted URL
+============================================================ -->
+<section id="work">
+  <div class="section-header reveal">
+    <span class="section-label">Selected Work</span>
+    <span class="section-count">(06)</span>
+  </div>
+
+  <div class="portfolio-grid">
+
+    <!-- ✏️ EDIT PHOTO 1: Replace URL with your photo -->
+    <div class="p-item p1 reveal">
+      <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1200&q=80"
+           alt="Portrait photography">
+      <div class="p-info">
+        <span class="p-info-num">01</span>
+        <!-- ✏️ EDIT: Change title and category -->
+        <div class="p-info-title">Portrait Series</div>
+        <div class="p-info-cat">Photography · Kent</div>
+      </div>
+    </div>
+
+    <!-- ✏️ EDIT PHOTO 2: Replace URL with your photo -->
+    <div class="p-item p2 reveal reveal-d1">
+      <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80"
+           alt="Wedding photography">
+      <div class="p-info">
+        <span class="p-info-num">02</span>
+        <!-- ✏️ EDIT: Change title and category -->
+        <div class="p-info-title">Wedding Story</div>
+        <div class="p-info-cat">Wedding · Canterbury</div>
+      </div>
+    </div>
+
+    <!-- ✏️ EDIT PHOTO 3: Replace URL with your photo -->
+    <div class="p-item p3 reveal reveal-d2">
+      <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80"
+           alt="Landscape photography">
+      <div class="p-info">
+        <span class="p-info-num">03</span>
+        <!-- ✏️ EDIT: Change title and category -->
+        <div class="p-info-title">Kent Landscape</div>
+        <div class="p-info-cat">Nature · Countryside</div>
+      </div>
+    </div>
+
+    <!-- ✏️ EDIT PHOTO 4: Replace URL with your photo -->
+    <div class="p-item p4 reveal reveal-d1">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80"
+           alt="Corporate portrait">
+      <div class="p-info">
+        <span class="p-info-num">04</span>
+        <!-- ✏️ EDIT: Change title and category -->
+        <div class="p-info-title">Corporate Headshot</div>
+        <div class="p-info-cat">Portrait · Business</div>
+      </div>
+    </div>
+
+    <!-- ✏️ EDIT PHOTO 5: Replace URL with your photo -->
+    <div class="p-item p5 reveal reveal-d2">
+      <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80"
+           alt="Event photography">
+      <div class="p-info">
+        <span class="p-info-num">05</span>
+        <!-- ✏️ EDIT: Change title and category -->
+        <div class="p-info-title">Event Coverage</div>
+        <div class="p-info-cat">Events · Maidstone</div>
+      </div>
+    </div>
+
+    <!-- ✏️ EDIT PHOTO 6: Replace URL with your photo -->
+    <div class="p-item p6 reveal reveal-d3">
+      <img src="https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800&q=80"
+           alt="Real estate photography">
+      <div class="p-info">
+        <span class="p-info-num">06</span>
+        <!-- ✏️ EDIT: Change title and category -->
+        <div class="p-info-title">Real Estate</div>
+        <div class="p-info-cat">Property · Kent</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+   ABOUT
+============================================================ -->
+<section id="about">
+  <div class="about-left">
+
+    <div class="about-big-text reveal">
+      Capturing the<br>
+      world through<br>
+      <em>a unique lens</em>
+    </div>
+
+    <!-- ✏️ EDIT: Replace with your own bio text -->
+    <p class="about-body reveal reveal-d1">
+      Hi, I'm Lokesh — a creative photographer and visual artist
+      based in Kent, UK. With over 4 years of professional
+      experience in photography, video creation and post-production
+      editing, I bring an intuitive and distinctive perspective to
+      every project I take on.
+    </p>
+    <p class="about-body reveal reveal-d2">
+      From golden-hour portraits to dramatic landscapes and
+      memorable events, my work blends technical precision
+      with an artistic eye — ensuring every frame tells a
+      story worth remembering.
+    </p>
+
+    <div class="about-stats reveal reveal-d3">
+      <!-- ✏️ EDIT: Update your stats -->
+      <div class="stat">
+        <span class="stat-n">4+</span>
+        <span class="stat-l">Years Experience</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n">200+</span>
+        <span class="stat-l">Projects Done</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n">UK</span>
+        <span class="stat-l">Based in Kent</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n">★★★★★</span>
+        <span class="stat-l">Client Rating</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="about-right reveal reveal-d2">
+
+    <!-- ============================================================
+       ✏️ EDIT YOUR PHOTO:
+       Replace the src below with YOUR own photo URL.
+       Example: src="images/lokesh.jpg" (if file is in same folder)
+       Or use a hosted URL from Google Photos, Dropbox, etc.
+    ============================================================ -->
+    <div class="about-photo-wrap">
+      <img class="about-photo"
+           src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80"
+           alt="Lokesh — CG Pixel Photographer">
+      <div class="about-photo-label">Lokesh · CG Pixel</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+   SERVICES
+   ✏️ EDIT: Update service names, descriptions and prices
+============================================================ -->
+<section id="services">
+  <div class="section-header reveal">
+    <span class="section-label">Services</span>
+    <span class="section-count">(06)</span>
+  </div>
+  <div class="services-grid">
+    <div class="services-left reveal">
+      <span class="section-label">What I Offer</span>
+      <p style="margin-top:1rem;">
+        Professional photography and editing
+        services tailored to your vision.
+        Based in Kent, available UK-wide
+        and remotely worldwide.
+      </p>
+    </div>
+    <div class="services-right">
+
+      <div class="service-row reveal">
+        <div class="service-left-col">
+          <span class="srv-num">01</span>
+          <div>
+            <div class="srv-name">Wedding &amp; Engagement</div>
+            <div class="srv-desc">Full-day coverage. Timeless, emotional, documentary-style.</div>
+          </div>
+        </div>
+        <span class="srv-price">From £800</span>
+      </div>
+
+      <div class="service-row reveal reveal-d1">
+        <div class="service-left-col">
+          <span class="srv-num">02</span>
+          <div>
+            <div class="srv-name">Portrait Sessions</div>
+            <div class="srv-desc">Individuals, couples and families. Studio or on-location.</div>
+          </div>
+        </div>
+        <span class="srv-price">From £150</span>
+      </div>
+
+      <div class="service-row reveal reveal-d2">
+        <div class="service-left-col">
+          <span class="srv-num">03</span>
+          <div>
+            <div class="srv-name">Event Photography</div>
+            <div class="srv-desc">Corporate events, parties, festivals. Full gallery delivery.</div>
+          </div>
+        </div>
+        <span class="srv-price">From £200</span>
+      </div>
+
+      <div class="service-row reveal reveal-d1">
+        <div class="service-left-col">
+          <span class="srv-num">04</span>
+          <div>
+            <div class="srv-name">Real Estate Photography</div>
+            <div class="srv-desc">HDR, sky replacement and virtual staging for estate agents.</div>
+          </div>
+        </div>
+        <span class="srv-price">From £100</span>
+      </div>
+
+      <div class="service-row reveal reveal-d2">
+        <div class="service-left-col">
+          <span class="srv-num">05</span>
+          <div>
+            <div class="srv-name">Photo Editing</div>
+            <div class="srv-desc">Remote retouching. Wedding, portrait, real estate editing.</div>
+          </div>
+        </div>
+        <span class="srv-price">From £0.50/img</span>
+      </div>
+
+      <div class="service-row reveal reveal-d3">
+        <div class="service-left-col">
+          <span class="srv-num">06</span>
+          <div>
+            <div class="srv-name">Video Production</div>
+            <div class="srv-desc">Cinematic reels, highlight films and promotional content.</div>
+          </div>
+        </div>
+        <span class="srv-price">From £300</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+   CONTACT
+   ✏️ EDIT: Replace ALL contact details with your own
+============================================================ -->
+<section id="contact">
+  <div class="section-header reveal">
+    <span class="section-label">Contact</span>
+    <span class="section-count">Let's talk</span>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-left">
+
+      <div class="contact-big reveal">
+        Let's build<br>
+        your <em>vision</em>
+      </div>
+
+      <div class="contact-emails reveal reveal-d1">
+
+        <!-- ✏️ EDIT: Replace with your email addresses -->
+        <div class="contact-email-row">
+          <span class="email-label">General</span>
+          <span class="email-val" data-email="hello@cgpixel.co.uk">hello@cgpixel.co.uk</span>
+          <button class="copy-btn" onclick="copyEmail(this,'hello@cgpixel.co.uk')">Copy</button>
+        </div>
+
+        <div class="contact-email-row">
+          <span class="email-label">Bookings</span>
+          <span class="email-val" data-email="book@cgpixel.co.uk">book@cgpixel.co.uk</span>
+          <button class="copy-btn" onclick="copyEmail(this,'book@cgpixel.co.uk')">Copy</button>
+        </div>
+
+        <div class="contact-email-row">
+          <span class="email-label">Editing</span>
+          <span class="email-val" data-email="edit@cgpixel.co.uk">edit@cgpixel.co.uk</span>
+          <button class="copy-btn" onclick="copyEmail(this,'edit@cgpixel.co.uk')">Copy</button>
+        </div>
+
+        <!-- ✏️ EDIT: Replace with your location -->
+        <div class="contact-email-row">
+          <span class="email-label">Location</span>
+          <span class="email-val">Kent, United Kingdom</span>
+        </div>
+
+        <!-- ✏️ EDIT: Replace with your phone number -->
+        <div class="contact-email-row">
+          <span class="email-label">Phone</span>
+          <span class="email-val">+44 700 000 0000</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="contact-right reveal reveal-d2">
+      <div class="contact-form">
+        <div class="form-row">
+          <label class="form-label">Your Name</label>
+          <input class="form-input" type="text" placeholder="Jane Smith" id="form-name">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" placeholder="jane@email.com" id="form-email">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Service</label>
+          <input class="form-input" type="text" placeholder="Wedding, Portrait, Editing…" id="form-service">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" placeholder="Tell me about your project…" id="form-msg"></textarea>
+        </div>
+        <button class="form-submit" onclick="sendEnquiry()">
+          Send Enquiry <span class="submit-arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+   FOOTER
+============================================================ -->
+<footer>
+  <a href="#" class="footer-logo">CG Pixel</a>
+  <!-- ✏️ EDIT: Update year and your name -->
+  <span class="footer-copy">© 2025 Lokesh · CG Pixel · Kent, UK. All rights reserved.</span>
+  <div class="footer-links">
+    <!-- ✏️ EDIT: Replace with your social links -->
+    <a href="https://www.instagram.com/lokesh_c.g/" target="_blank">Instagram</a>
+    <a href="https://cgpixel.myportfolio.com/" target="_blank">Portfolio</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<!-- ============================================================
+   JAVASCRIPT
+============================================================ -->
+<script>
+// ============================================================
+// ✏️  EDIT YOUR EMAIL — used by the contact form
+// ============================================================
+const YOUR_EMAIL = 'hello@cgpixel.co.uk';
+// ============================================================
+
+/* ── CURSOR ── */
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+document.querySelectorAll('a, button, .p-item, .service-row, .contact-email-row').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('big'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('big'));
+});
+document.querySelectorAll('input, textarea').forEach(el => {
+  el.addEventListener('focus',  () => cur.classList.add('text-mode'));
+  el.addEventListener('blur',   () => cur.classList.remove('text-mode'));
+});
+
+/* ── LOADER ── */
+const loaderNum = document.getElementById('loaderNum');
+const loaderBar = document.getElementById('loaderBar');
+let count = 0;
+const timer = setInterval(() => {
+  count += Math.floor(Math.random() * 8) + 3;
+  if (count >= 100) {
+    count = 100;
+    clearInterval(timer);
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('out');
+    }, 300);
+  }
+  loaderNum.textContent = count;
+  loaderBar.style.width = count + '%';
+}, 60);
+
+/* ── HAMBURGER MENU ── */
+const burger  = document.getElementById('burger');
+const overlay = document.getElementById('menu-overlay');
+let menuOpen  = false;
+burger.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  burger.classList.toggle('open', menuOpen);
+  overlay.classList.toggle('open', menuOpen);
+  document.body.style.overflow = menuOpen ? 'hidden' : '';
+});
+overlay.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    menuOpen = false;
+    burger.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+});
+
+/* ── SCROLL NAV ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 80);
+});
+
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── COPY EMAIL ── */
+function copyEmail(btn, email) {
+  navigator.clipboard.writeText(email).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+/* ── CONTACT FORM ── */
+function sendEnquiry() {
+  const name    = document.getElementById('form-name').value.trim();
+  const email   = document.getElementById('form-email').value.trim();
+  const service = document.getElementById('form-service').value.trim();
+  const msg     = document.getElementById('form-msg').value.trim();
+  if (!name || !email) { alert('Please enter your name and email.'); return; }
+  const subject = encodeURIComponent(`Enquiry from ${name} — ${service || 'CG Pixel'}`);
+  const body    = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nService: ${service}\n\n${msg}`);
+  window.location.href = `mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`;
+}
+</script>
+</body>
+</html>
+
